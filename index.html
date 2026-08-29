@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WebUSB Hello World</title>
+</head>
+<body>
+    <h1>WebUSB Hello World</h1>
+    <p>Klicke auf den Button, um ein USB-Gerät auszuwählen.</p>
+
+    <button id="connect">Mit USB-Gerät verbinden</button>
+    <pre id="log"></pre>
+
+    <script>
+        const logEl = document.getElementById('log');
+        const log = msg => {
+            logEl.textContent += msg + '\n';
+            console.log(msg);
+        };
+
+        document.getElementById('connect').addEventListener('click', async () => {
+            if (!('usb' in navigator)) {
+                log('WebUSB wird von diesem Browser nicht unterstützt.');
+                return;
+            }
+
+            try {
+                // TODO: Passe filters an dein Gerät an (Vendor/Product ID)
+                const device = await navigator.usb.requestDevice({
+                    filters: [
+                        // Beispiel:
+                        // { vendorId: 0x1234, productId: 0x0001 }
+                    ]
+                });
+
+                log(`Gerät ausgewählt: ${device.productName || 'Unbekannt'} (${device.vendorId}:${device.productId})`);
+
+                await device.open();
+                log('Gerät geöffnet.');
+
+                // Falls nötig:
+                // await device.selectConfiguration(1);
+                // await device.claimInterface(0);
+
+                log('Bereit für weitere WebUSB-Kommandos.');
+            } catch (e) {
+                log('Fehler oder abgebrochen: ' + e);
+            }
+        });
+    </script>
+</body>
+</html>
